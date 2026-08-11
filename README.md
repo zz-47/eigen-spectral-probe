@@ -10,7 +10,7 @@ The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition t
 |---|------|-------------|--------|
 | 1 | Spectra of real weights | Real SmolLM2 matrices have measurable spectral decay; α depends on matrix type | ✅ Complete (4 experiments measured) |
 | 2 | Semantic directions in spectral space | Leading singular directions encode common structure; trailing encode noise | ✅ Complete (4 experiments measured) |
-| 3 | Truncation and output fidelity | Truncation at k90 gives bounded, measurable output drift | ⬜ Planned |
+| 3 | Truncation and output fidelity | Truncation at k90 gives bounded, measurable output drift | ✅ Complete (4 experiments measured) |
 | 4 | Scale-out: spectra 135M→1.7B | Spectral structure partly architectural, partly size-dependent | ⬜ Planned |
 | 5 | Weight probing via decomposition | Semantic properties readable from spectral components | ⬜ Planned |
 | 6 | Deployment: spectral pruning | Pruning trades output drift for CPU speedup, measurably | ⬜ Planned |
@@ -104,3 +104,22 @@ eigen-spectral-probe/
 **The key surprise.** Even with all 576 coordinates, R² only reaches 0.628 — frequency is not fully linearly readable from spectral space. The spectral head (top-10) captures 41%; the remaining 22 points of R² are spread thinly across 566 coordinates.
 
 **Verdict in one line.** The leading spectral coordinate captures 30.4% of token frequency variance; R² decays monotonically to essentially zero by coordinate 100; but even all 576 coordinates together only explain 62.8%.
+
+---
+
+## Unit 3 — Truncation and output fidelity (complete)
+
+**Design.** For each of 8 matrices, truncate W at k = 1, 10, k90, 0.5*k90. Measure theoretical Frobenius error, actual output drift (KL divergence), and cosine similarity.
+
+**Measured findings (SmolLM2-135M, not assumed):**
+
+| # | Claim | Predicted | Measured | Verdict |
+|---|---|---|---|---|
+| C1 | Eckart-Young holds numerically | error <= 1e-6 | actual == theory in every row | Holds |
+| C2 | Flat matrices tolerate more truncation | FFN rel_err < attention | opposite at fixed k | Reversed |
+| C3 | Drift correlates with Frobenius error | high error => high KL | up worst rel_err but moderate KL | Reversed |
+| C4 | k90 truncation preserves output | KL < 0.1 | all KL < 0.05 | Holds |
+
+**The key insight.** Frobenius error does not predict output drift. At k=1, up loses 99.7% of its Frobenius energy but the output only drifts 0.1 nats. v loses 98.4% but drifts only 0.005 nats. The output is insensitive to directions that matter in Frobenius norm.
+
+**Verdict in one line.** The Eckart-Young theorem holds exactly, and truncation at k90 preserves output (KL < 0.05) — but Frobenius error does NOT predict output drift, so pruning decisions need output-level measurement.
