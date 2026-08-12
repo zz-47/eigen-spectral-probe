@@ -1,6 +1,6 @@
 # eigen-spectral-probe
 
-The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition to semantic probing to deployment-time spectral pruning. CPU-only, no assumptions.
+The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition to semantic probing to deployment-time spectral pruning. CPU-only, not assumptions.
 
 ---
 
