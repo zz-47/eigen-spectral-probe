@@ -1,10 +1,7 @@
 # eigen-spectral-probe
 
-<<<<<<< HEAD
+
 The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition to semantic probing to deployment-time spectral pruning. CPU-only, not assumptions.
-=======
-The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition to semantic probing to deployment-time spectral pruning. CPU-only, no assumptions.
->>>>>>> main
 
 ---
 
@@ -16,13 +13,8 @@ The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition t
 | 2 | Semantic directions in spectral space | Leading singular directions encode common structure; trailing encode noise | ✅ Complete (4 experiments measured) |
 | 3 | Truncation and output fidelity | Truncation at k90 gives bounded, measurable output drift | ✅ Complete (4 experiments measured) |
 | 4 | Scale-out: spectra 135M→1.7B | Spectral structure partly architectural, partly size-dependent | ⬜ Planned |
-<<<<<<< HEAD
 | 5 | Weight probing via decomposition | Semantic properties readable from spectral components | ✅ Complete (4 experiments measured) |
 | 6 | Deployment: spectral pruning | Pruning trades output drift for CPU speedup, measurably | ✅ Complete (4 experiments measured) |
-=======
-| 5 | Weight probing via decomposition | Semantic properties readable from spectral components | ⬜ Planned |
-| 6 | Deployment: spectral pruning | Pruning trades output drift for CPU speedup, measurably | ⬜ Planned |
->>>>>>> main
 
 ---
 
