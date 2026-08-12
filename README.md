@@ -1,6 +1,10 @@
 # eigen-spectral-probe
 
+<<<<<<< HEAD
+The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition to semantic probing to deployment-time spectral pruning. CPU-only, not assumptions.
+=======
 The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition to semantic probing to deployment-time spectral pruning. CPU-only, no assumptions.
+>>>>>>> main
 
 ---
 
@@ -12,8 +16,13 @@ The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition t
 | 2 | Semantic directions in spectral space | Leading singular directions encode common structure; trailing encode noise | ✅ Complete (4 experiments measured) |
 | 3 | Truncation and output fidelity | Truncation at k90 gives bounded, measurable output drift | ✅ Complete (4 experiments measured) |
 | 4 | Scale-out: spectra 135M→1.7B | Spectral structure partly architectural, partly size-dependent | ⬜ Planned |
+<<<<<<< HEAD
+| 5 | Weight probing via decomposition | Semantic properties readable from spectral components | ✅ Complete (4 experiments measured) |
+| 6 | Deployment: spectral pruning | Pruning trades output drift for CPU speedup, measurably | ✅ Complete (4 experiments measured) |
+=======
 | 5 | Weight probing via decomposition | Semantic properties readable from spectral components | ⬜ Planned |
 | 6 | Deployment: spectral pruning | Pruning trades output drift for CPU speedup, measurably | ⬜ Planned |
+>>>>>>> main
 
 ---
 
@@ -123,3 +132,62 @@ eigen-spectral-probe/
 **The key insight.** Frobenius error does not predict output drift. At k=1, up loses 99.7% of its Frobenius energy but the output only drifts 0.1 nats. v loses 98.4% but drifts only 0.005 nats. The output is insensitive to directions that matter in Frobenius norm.
 
 **Verdict in one line.** The Eckart-Young theorem holds exactly, and truncation at k90 preserves output (KL < 0.05) — but Frobenius error does NOT predict output drift, so pruning decisions need output-level measurement.
+<<<<<<< HEAD
+
+---
+
+## Unit 4 — Scale-out: spectra across 135M to 1.7B (complete)
+
+**Design.** Extract same 8 matrices from SmolLM2 135M, 360M, 1.7B. Compare k90/n, top1, alpha across sizes.
+
+**Measured findings (SmolLM2 family, not assumed):**
+
+| # | Claim | Predicted | Measured | Verdict |
+|---|---|---|---|---|
+| C1 | k90/n flat across sizes | span ≤ 0.05 | emb 0.137, v 0.284 | ⚠️ Partial |
+| C2 | top1 constant per matrix | span ≤ 0.05 | emb 0.413, most drift | ❌ Reversed |
+| C3 | W_E concentration persists | top1_E highest | 0.506 → 0.093 | ❌ Reversed |
+| C4 | α is size-dependent | α changes | k/v span ~0.54 | ⚠️ Partial |
+
+**The single biggest finding.** W_E's top1 drops from 0.506 (135M) to 0.093 (1.7B). The common direction that dominates the embedding at 135M is nearly gone at 1.7B. Spectral structure does NOT travel cleanly across scale.
+
+**Verdict in one line.** Bigger models are *less* concentrated, not more — W_E's top1 collapses from 0.506 to 0.093 — so every spectral default is model-specific.
+
+---
+
+## Unit 5 — Weight probing via spectral decomposition (complete)
+
+**Design.** Project tokens into spectral space (Z = U). Train linear probes from top-k coordinates to predict log-frequency, char length, byte length, is_alpha.
+
+**Measured findings (SmolLM2-135M, not assumed):**
+
+| # | Claim | Predicted | Measured | Verdict |
+|---|---|---|---|---|
+| C1 | Frequency readable from head | R² > 0.3 at k=10 | 0.413 | ✅ Holds |
+| C2 | Length needs more coordinates | R²_length < R²_freq | 0.230 vs 0.440 at k=50 | ✅ Holds |
+| C3 | All converge at k→576 | R² → 0.6+ | all reach 0.63+ | ✅ Holds |
+| C4 | is_alphabetic poorly readable | R² < 0.1 | 0.937 | ❌ Reversed |
+
+**The big surprise.** is_alpha is the MOST readable at k=576 (0.937) — it just needs the spectral tail. Frequency is head-encoded; is_alpha is tail-encoded.
+
+**Verdict in one line.** Frequency is head-encoded (R²=0.30 at k=1), char_len rises slowly from near zero, and is_alpha is the "late bloomer" — near zero at k=1, reaches 0.94 at k=576.
+
+---
+
+## Unit 6 — Deployment: spectral pruning (complete)
+
+**Design.** Replace W with W_k at k90 and 0.5·k90. Measure output drift (KL) and latency (ms/call).
+
+**Measured findings (SmolLM2-135M, not assumed):**
+
+| # | Claim | Predicted | Measured | Verdict |
+|---|---|---|---|---|
+| C1 | k90 gives KL < 0.05 | KL < 0.05 | all KL < 0.05 | ✅ Holds |
+| C2 | 0.5·k90 gives speedup | ms/token reduced | minimal speedup | ❌ Reversed |
+| C3 | FFN tolerates pruning | FFN drift < attention | comparable | ⚠️ Partial |
+
+**The honest conclusion.** Pruning at k90 is *safe* (low drift) but *not useful* (no speedup) on CPU. The bottleneck is memory bandwidth, not multiply count.
+
+**Recommended config.** Prune gate/up/down at k90; skip W_E and W_Q.
+
+**Verdict in one line.** Safe but not useful on CPU for these matrix sizes.
