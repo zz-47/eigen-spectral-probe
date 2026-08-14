@@ -70,7 +70,7 @@ eigen-spectral-probe/
 
 ---
 
-## Unit 1 — Spectra of real SmolLM2 weights (complete)
+## Study 1 — Spectra of real SmolLM2 weights (complete)
 
 **Design.** SVD of eight matrices from SmolLM2-135M layer 0: W_Q, W_K, W_V, W_O, W_gate, W_up, W_down, W_E. Five metrics per matrix: n, top1, k90, k90/n, α (power-law exponent).
 
@@ -89,7 +89,7 @@ eigen-spectral-probe/
 
 ---
 
-## Unit 2 — Semantic directions in spectral space (complete)
+## Study 2 — Semantic directions in spectral space (complete)
 
 **Design.** SVD W_E, project all 49,152 tokens into whitened spectral coordinates (Z = U). Regress token log-frequency against each coordinate and against spectral bands.
 
@@ -108,7 +108,7 @@ eigen-spectral-probe/
 
 ---
 
-## Unit 3 — Truncation and output fidelity (complete)
+## Study 3 — Truncation and output fidelity (complete)
 
 **Design.** For each of 8 matrices, truncate W at k = 1, 10, k90, 0.5*k90. Measure theoretical Frobenius error, actual output drift (KL divergence), and cosine similarity.
 
@@ -124,11 +124,11 @@ eigen-spectral-probe/
 **The key insight.** Frobenius error does not predict output drift. At k=1, up loses 99.7% of its Frobenius energy but the output only drifts 0.1 nats. v loses 98.4% but drifts only 0.005 nats. The output is insensitive to directions that matter in Frobenius norm.
 
 **Verdict in one line.** The Eckart-Young theorem holds exactly, and truncation at k90 preserves output (KL < 0.05) — but Frobenius error does NOT predict output drift, so pruning decisions need output-level measurement.
-<<<<<<< HEAD
+
 
 ---
 
-## Unit 4 — Scale-out: spectra across 135M to 1.7B (complete)
+## Study 4 — Scale-out: spectra across 135M to 1.7B (complete)
 
 **Design.** Extract same 8 matrices from SmolLM2 135M, 360M, 1.7B. Compare k90/n, top1, alpha across sizes.
 
@@ -147,7 +147,7 @@ eigen-spectral-probe/
 
 ---
 
-## Unit 5 — Weight probing via spectral decomposition (complete)
+## Study 5 — Weight probing via spectral decomposition (complete)
 
 **Design.** Project tokens into spectral space (Z = U). Train linear probes from top-k coordinates to predict log-frequency, char length, byte length, is_alpha.
 
@@ -166,7 +166,7 @@ eigen-spectral-probe/
 
 ---
 
-## Unit 6 — Deployment: spectral pruning (complete)
+## Study 6 — Deployment: spectral pruning (complete)
 
 **Design.** Replace W with W_k at k90 and 0.5·k90. Measure output drift (KL) and latency (ms/call).
 
