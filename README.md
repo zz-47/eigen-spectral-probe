@@ -5,9 +5,9 @@ The spectral structure of SmolLM2 weight matrices — eigenvalue decomposition t
 
 ---
 
-## Units
+## Case-Studies
 
-| # | Unit | Claim to test | Status |
+| # | Study | Claim to test | Status |
 |---|------|-------------|--------|
 | 1 | Spectra of real weights | Real SmolLM2 matrices have measurable spectral decay; α depends on matrix type | ✅ Complete (4 experiments measured) |
 | 2 | Semantic directions in spectral space | Leading singular directions encode common structure; trailing encode noise | ✅ Complete (4 experiments measured) |
